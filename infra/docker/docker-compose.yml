@@ -1,0 +1,43 @@
+# LeadChat Docker Compose — Local Development
+# PostgreSQL 16 + Redis 7 for matching queue
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: leadchat-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: leadchat
+      POSTGRES_USER: leadchat
+      POSTGRES_PASSWORD: leadchat_dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../../infra/db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U leadchat -d leadchat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: leadchat-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local

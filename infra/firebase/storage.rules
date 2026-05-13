@@ -1,0 +1,34 @@
+// ============================================
+// LeadChat — Firebase Storage Security Rules
+// Authenticated upload only (Mission 7 security)
+// ============================================
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Default: deny all
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // User profile photos
+    match /profiles/{userId}/{allPaths=**} {
+      // Anyone can read profile photos
+      allow read: if true;
+      // Only authenticated owner can upload (max 5MB, images only)
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Proposal documents in deal rooms
+    match /proposals/{dealRoomId}/{allPaths=**} {
+      // Only authenticated users can read/write proposals
+      allow read: if request.auth != null;
+      // Upload: authenticated, max 25MB, PDF/DOC types
+      allow write: if request.auth != null
+                   && request.resource.size < 25 * 1024 * 1024;
+    }
+  }
+}

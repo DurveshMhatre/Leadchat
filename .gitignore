@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables - NEVER commit
+.env
+.env.local
+.env.production
+/leadchat-472f9-firebase-adminsdk-fbsvc-3981bf80a6.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Expo
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Docker volumes
+pgdata/
+redisdata/
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp files
+*.tmp
+convert.ps1
+LeadChat_Antigravity_Prompt.txt
+LeadChat_Antigravity_Prompt.docx
+LeadChat_anti_prompt.md
+
+#ignore folder
+/UI Design
