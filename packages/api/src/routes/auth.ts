@@ -76,7 +76,17 @@ authRouter.post('/auth/register', async (req, res, next) => {
     // Validate request body
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      throw new AppError(400, 'Invalid registration data', 'VALIDATION_ERROR');
+      const fields = parsed.error.errors.map((e) => ({
+        field: e.path.join('.'),
+        message: e.message,
+      }));
+      res.status(422).json({
+        success: false,
+        error: 'VALIDATION_FAILED',
+        message: 'Registration data is invalid.',
+        fields,
+      });
+      return;
     }
 
     const { role, displayName, industry, phone, serviceType, tagline } = parsed.data;
@@ -84,11 +94,11 @@ authRouter.post('/auth/register', async (req, res, next) => {
     // Check if user already exists
     const existing = await getUserByFirebaseUid(firebaseUid);
     if (existing) {
-      // Return existing user
-      res.json({
-        success: true,
+      res.status(409).json({
+        success: false,
+        error: 'USER_ALREADY_EXISTS',
+        message: 'An account with this phone number already exists.',
         data: toPublicProfile(existing),
-        message: 'User already registered',
       });
       return;
     }
